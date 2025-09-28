@@ -1,217 +1,199 @@
-# Week04 Quiz2:
+# Week05 Quiz1:
 
 ## 1. Requirements:
 
-A local government has introduced a newborn bonus program—each family will receive 100g of 24K gold bars engraved with their baby's name, birth date, 100th day(i.e. On the 100th day of birth), first birthday, and the scheduled start date for elementary school (i.e., March 1st of the year after seven years of birth). Make a system manages newborn information through a database of babys
+In the task of this week, we intend to apply various operators to higher-order equation objects.
+We want to allocate dynamic memory to an array composed of coefficients of higher-order equations and apply various operators to higher-order equation objects.
 
 - Writing code using c++
-- Use `Baby` class and `Date` class to complete your code. 
+- Use `Equation` class to complete your code. 
 - Changing the provided class is not allowed. You can `only use the provided class and the functions defined within it`.
-- You need to store the `two given class definitions` in the `Baby.h` and `Date.h` files respectively. Store the `function definitions and the main function` in the `main.cpp` file.   
-  `(Please submit the above three documents, and if you do not name the main file "main.cpp", the test will not pass and you will receive zero points)`
-- Please confirm the containment relationship between classes and ensure reasonable calls between header files.
+- You need to store the `given class definitions` in the `Equation.h` file. Store the `function definitions and the main function` in the `main.cpp` file.   
+  `(Please submit the above two documents, and if you do not name the main file "main.cpp", the test will not pass and you will receive zero points)`
+- Your submitted files should `include only one ".cpp" file named "main.cpp"`. Any ".cpp" files with other names will not be accepted by the test system.
+- Please confirm the containment relationship between header file and main file.
 
 <br/>
                   
-### Baby class:
+### Equation class:
 - Complete and use the following class:
   ```C++
-  class Baby {
+  class Equation
+  {
+		friend bool operator==(const Equation& lhs, const Equation& rhs);
+		friend ostream& operator<<(ostream& out, const Equation& eq);
+	
+		friend Equation operator+(const Equation& lhs, const Equation& rhs);
+		friend Equation operator-(const Equation& lhs, const Equation& rhs);
+		friend Equation operator*(const Equation& lhs, double rhs);
+		friend Equation operator*(double lhs, const Equation& rhs);
+  
 	public:
-		Baby(const std::string & = "", const Date & = Date());
-  
-		void setName(string&); // set the value of its parameters to the name data(string type)
-  
-		void setBirthDate(Date&);
-  		// set the value of its parameters to the birthDate data(Date type), If the baby is born on February 29 in a leap year, their first birthday is rescheduled to February 28 of the following year.
-  
-		string getName() const; // return the value of name data.
-  
-		Date getBirthDate() const; // return the value of birthDate data.
+		Equation(double coefficients[], int number);
+		Equation(const Equation& rhs); // copy constructor, set the content of "rhs" to the content of itself
+		~Equation();
+		int degree() const { return size - 1; }
+	
+		Equation& operator= (const Equation& rhs);
+		Equation& operator+= (const Equation& rhs);
+		Equation& operator-= (const Equation& rhs);
+		Equation& operator*= (double rhs);
   
 	private:
-		string name;
-		Date birthDate;
-	};
+		int size; // size of the coeff array (= degree + 1) 
+		double* coeff; // coefs will be an array, store the coefficient of each item
+  };
   ```
 <br/>
 
-### Date class
-- Complete and use the following class:
-  ```C++
-  class Date {
-		friend std::ostream& operator<<(std::ostream&, const Date&); //
-		friend Date firstbirthday(const Date&);
-	public:
-		Date(int m = 1, int d = 1, int y = 1900); // default constructor, The provided data is raw data in the format of "month, day, year".
+
+- The degree of the equation is `one less than the number of terms (size)` entered by the user.
+- Input and output the coefficients of each term in order from the highest degree to the constant term.  
+  e.g. `1 2 3 4 -> x^3+2x^2+3x+4`
+- The number of terms n entered by the user is an integer greater than or equal to 2, and n coefficients are input, including those with a coefficient of 0. When outputting the equation, terms with a coefficient of 0 are omitted.  
+  e.g. `For the equation 5x^3+0x^2+2x^1-3=0, the number of terms is 4, and the coefficients are 5, 0, 2, -3. Since terms with zero coefficients (including the constant term) are not displayed in the equation output, this equation is printed as 5x^3+2x^1+3=0.`
+- When the highest order coefficient is 0, the program will output an error message and ask for re-entry.  
+  Error Message: `Error: The highest order coefficient shouldn't be zero. Please enter again.`
+- The compound assignment operators (=, +-, -=, *=) are defined as member functions of the class, while the +, -, and * operators are defined as friend functions.
+- The *= and * operators are not for the multiplication of equations but for the multiplication of an equation with a real number.
+- The calculate result of `eq1` and `eq2` should be storage into another Equation `eq3`.
+- Write a program that creates two equations, eq1 and eq2, based on user input and performs the following operations.
+```C++
+cout << "eq1: " << eq1 << endl; cout << "eq2: " << eq2 << endl; 
+Equation C = eq1 + eq2; 
+cout << "eq1+eq2: " << C << endl; 
+if (eq1 == eq2) 
+cout << "eq1 and eq2 are equal" << endl; 
+else { 
+cout << "eq1 and eq2 are not equal" << endl; 
+Equation D = eq1 - eq2; 
+cout << "eq1-eq2: " << D << endl; } 
+Equation eq3(eq1); 
+cout << "eq3 after eq3(eq1): " << eq3 << endl; 
+eq3 += eq2; 
+cout << "eq3 after eq3+=eq2: " << eq3 << endl; 
+Equation eq4 = eq3 * 0.5; 
+cout << "eq3*0.5: " << eq4 << endl; 
+Equation eq5 = 4 * eq3; 
+cout << "4*eq3: " << eq5 << endl;
+```
   
-		void setDate(int, int, int); // Input sequence should be `month, day, year`. The input of year should `between 1900 and 2100`.
-  
-		Date& operator++(); // prefix increment operator
-  
-		Date operator++(int); // postfix increment operator
-  
-		Date& operator+=(unsigned int); // add days, modify object
-  
-		static bool leapYear(int); // verify that if the year a leap year, return true when correct.
-  
-		bool endOfMonth(int) const; // verify that if the input day is the last day of month, return true when correct.
-  
-		int schoolyear() const; // return the year baby goto the primary school.It should be the 7th year after born (this.year += 7).
-  
-	private:
-		unsigned int month;
-  
-		unsigned int day;
-  
-		unsigned int year;
-  
-		int days[13] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }; // maximum days per month. In a leap year, February has 29 days.
-  
-		void helpIncrement();
-  		// utility function for incrementing date. If today is the last day of month, then set day = 1 and month += 1, If today is the last day of year, then set day = 1, month = 1 and year += 1.
-	};
-  ```
-- The input of year should `between 1900 and 2100`.
-- The input of month should `between 1 and 12`.
-- The input of day should `greater than or equal to 1 and less than the maximum number of days in this month`.
-- If not follow above rules, an error will occur while creating a Date data, output the error message and use the default value of `January 1, 1900`.
-- Leap year: Years that can be divided by 4 but not by 100, or years that can be divided by 400.
-  ```C++
-  bool leap;
-  if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
-  leap = true;
-  else
-  leap = false;
-  ```
-- `operator++()` function is used to overload prefix increment operator.
-  ```C++
-  Date& Date::operator++() {
-	  helpIncrement(); // increment date 
-	  return *this; // reference return to create an lvalue
-  }
-  ```
-- `operator++(int)` function is used to overload postfix increment operator.
-  ```C++
-  Date Date::operator++(int) {
-  	Date temp = *this ; // hold current state of object 
-  	helpIncrement();
-  
-  	// return unincremented, saved, temporary object 
-  	return temp;  // value return; not a reference return 
-  }
-  ```
-- `operator+=(unsigned int additionalDays)` function is used to add specified number of days to date by overload the operator '+='.
-  ```C++
-  Date& Date::operator+=(unsigned int additionalDays) {
-  	for (unsigned int i = 0; i < additionalDays; ++i) {
-  		helpIncrement();
-  	}
-  	return *this; // enables cascading 
-  }
-  ```
-- `operator<<` function is used to directly output birthday on a form of `month/day/year` by overload the operator '<<'.
-  ```C++
-  ostream& operator<<(ostream& output, const Date& d) {
-  	
-  	output << d.month << "/" << d.day << "/" << d.year;
-  	return output; // enables cascading
-  }
-  ```
 <br/>
 
 ### Input
-- The first line contains a number (int type) representing the number of babies that are about to be entered.
-- Starting from the second line, input the corresponding number of baby's data based on the numbers entered in the first line. Format as `Name(string/char[] Type) monthOfBirth(int Type) dayOfBirth(int Type) yearOfBirth(int type)`, separated by spaces. Each data is followed by a new line until all inputs are complete. e.g. `Kim 1 1 1900`. 
+- The first line contains a number (int type) representing the number of terms in the first equation.  
+  e.g. `4`
+- The second line, enter the coefficients of each term starting from the highest degree to the constant term separate with spaces.  
+  e.g. `1 2 0 4`.
+- The third line contains a number (int type) representing the number of terms in the second equation.  
+  e.g. `5`
+- The fourth line, enter the coefficients of each term starting from the highest degree to the constant term separate with spaces.  
+  e.g. `1 2 0 0 5`.
 
 <br/>
 
 ### Output  
 
-- Output the name and date of birth on the first line.  
-  e.g. `Lee born on 2/29/2004`
-- Output the date of birth for the 100th day on the second line.  
-  e.g. `100th day: 6/7/2004`
-- Output the first birthday on the third line.  
-  e.g. `First birthday: 2/28/2005`
-- Output the date when started elementary school on the 4th line.  
-  e.g. `First school day: 3/1/2011`
-- After outputting each baby's information, leave a blank line, then re-enter and re-output the next baby's information.
+- Output the first equation on the first line.   
+  e.g. `eq1: 1x^2-2=0`
+- Output the second equation on the second line.  
+  e.g. `eq2: 2x^3-4=0`
+- Output the sum of the first and the second equation on the third line.  
+  e.g. `eq1+eq2: 2x^3+1x^2-6=0`
+- Output if the first and the second equation are equal on the 4th line.  
+  e.g. `eq1 and eq2 are not equal`
+- Output the difference of the first and the second equation on the 5th line.  
+  e.g. `eq1-eq2: -2x^3+1x^2+2=0`
+- Output the result of `changing eq3 to eq1` on the 6th line.  
+  e.g. `eq3 after eq3(eq1): 1x^2-2=0`
+- Output the sum of eq3 and eq2 using `+=` on the 7th line.  
+  e.g. `eq3 after eq3+=eq2: 2x^3+1x^2-6=0`
+- Output the product of eq3 and 0.5 using `*` on the 8th line.  
+  e.g. `eq3*0.5: 1x^3+0.5x^2-3=0`
+- Output the product of eq3 and 4 using `*` on the 9th line.  
+  e.g. `4*eq3: 4x^4+12x^3+8x^2+36=0`
+
 
 <br/>
 
 ### Error handling
 
-- When the month is less than 1 or more than 12, output `"Error: Month must be 1-12"`.
-- When the day is less than 1 or exceeds the maximum number of days in the month, output `"Error: Day is out of range for current month and year"`.
-- When the year is less than 1900 or more than 2100, output `"Error: Year must be >= 1900 and <= 2100"`.
-- Check the entered dates in order of `month, day, and year` for any errors.
-- If multiple errors occur, `only output the first error message` in sequence.
-- After outputting the error message, `set the birthday date to the default date (1/1/1900)`.
+-When the highest order coefficient is 0, the program will output an error message and ask for re-entry.  
+ Error Message: `Error: The highest order coefficient shouldn't be zero. Please enter again.`
 
-### Other tips
-- When reading part of the input through `cin` and wanting to skip the subsequent part, the cache can be cleared using `cin.ignore(std::numeric_limits< streamsize >::max(), '\n');`.
-- If your compiler version does not support the use of `std::numeric_limits`, you can replace it with a sufficiently large number, such as 1024.
 <br/>
 
 ## 2. Scoring Criteria (5 points in total):
 
-- Uploaded `Baby.h`, `Date.h` and `main.cpp` three files with no compilation errors: 1 point
-- The cpp file calls two header files and declares the given functions: 2 point
+- Uploaded `Equation.h` and `main.cpp` two files with no compilation errors: 1 point
+- The cpp file calls header file and declares the given functions: 2 point
 - The result is correct: 2 point
 
 <br/>
 
-## 3 Example(Red font for input, blue font for output):
-![image](https://github.com/chyh001228/images/blob/main/w4q2.png)
+## 3 Example
+### Example1 (Red font for input, blue font for output):
+![image](https://github.com/chyh001228/images/blob/main/w5q1_e1.png)
 
 **Input:**
 
 ```
-5
-Kim 2 29 2004
-Jane 13 24 1997
-Lee 9 35 2012
-Luke 11 14 1857
-Roy 20 50 3000
+3
+0 1 2
+0 2 3
+1 0 -2
+4
+2 0 0 -4
 ```
 
 **Output:**
 
 ```
-Kim born on 2/29/2004
-100th day: 6/7/2004
-First birthday: 2/28/2005
-First school day: 3/1/2011
-
-Error: Month must be 1-12
-Jane born on 1/1/1900
-100th day: 4/10/1900
-First birthday: 1/1/1901
-First school day: 3/1/1907
-
-Error: Day is out of range for current month and year
-Lee born on 1/1/1900
-100th day: 4/10/1900
-First birthday: 1/1/1901
-First school day: 3/1/1907
-
-Error: Year must be >= 1900 and <= 2100
-Luke born on 1/1/1900
-100th day: 4/10/1900
-First birthday: 1/1/1901
-First school day: 3/1/1907
-
-Error: Month must be 1-12
-Roy born on 1/1/1900
-100th day: 4/10/1900
-First birthday: 1/1/1901
-First school day: 3/1/1907
+Error: The highest order coefficient shouldn't be zero. Please enter again.
+Error: The highest order coefficient shouldn't be zero. Please enter again.
+eq1: 1x^2-2=0
+eq2: 2x^3-4=0
+eq1+eq2: 2x^3+1x^2-6=0
+eq1 and eq2 are not equal
+eq1-eq2: -2x^3+1x^2+2=0
+eq3 after eq3(eq1): 1x^2-2=0
+eq3 after eq3+=eq2: 2x^3+1x^2-6=0
+eq3*0.5: 1x^3+0.5x^2-3=0
+4*eq3: 8x^3+4x^2-24=0
 ```
 
 **Actual results:**  
-![image](https://github.com/chyh001228/images/blob/main/w4q2_c.png)
+![image](https://github.com/chyh001228/images/blob/main/w5q1_c_e1.png)
 
-(The deadline is 00:00a.m. on September 28, 2025)
+<br/>
+
+### Example2 (Red font for input, blue font for output):
+![image](https://github.com/chyh001228/images/blob/main/w5q1_e2.png)
+
+**Input:**
+
+```
+4
+1 2.4 0 5
+4
+1 2.4 0 5
+```
+
+**Output:**
+
+```
+eq1: 1x^3+2.4x^2+5=0
+eq2: 1x^3+2.4x^2+5=0
+eq1+eq2: 2x^3+4.8x^2+10=0
+eq1 and eq2 are equal
+eq3 after eq3(eq1): 1x^3+2.4x^2+5=0
+eq3 after eq3+=eq2: 2x^3+4.8x^2+10=0
+eq3*0.5: 1x^3+2.4x^2+5=0
+4*eq3: 8x^3+19.2x^2+40=0
+```
+
+**Actual results:**  
+![image](https://github.com/chyh001228/images/blob/main/w5q1_c_e2.png)  
+(The deadline is 00:00a.m. on October 5, 2025)
 
 <img src="https://cdn.imweb.me/upload/S201906178853c3e170808/c5d876d707352.jpg" width=30% align=center />
